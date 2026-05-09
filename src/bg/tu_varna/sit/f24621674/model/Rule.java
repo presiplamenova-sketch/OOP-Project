@@ -1,6 +1,5 @@
 package bg.tu_varna.sit.f24621674.model;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,11 +7,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Едно правило в граматика – нетерминал от ляво и списък от символи отдясно.
- *
- * <p>Празният списък на дясната страна означава epsilon-продукция
- * (<code>A → ε</code>). Правилото е имутабилно; добавянето и премахването на
- * правила става на ниво {@link Grammar}, а не чрез мутация на самия обект.</p>
+ * Едно правило в граматика - нетерминал от ляво и списък от символи отдясно
+ * Празната дясна страна означава epsilon-продукция
  */
 public final class Rule {
 
@@ -20,15 +16,13 @@ public final class Rule {
     private final List<Symbol> right;
 
     /**
-     * Конструктор.
-     *
-     * @param left лявата страна – нетерминал (не може да е null)
-     * @param right дясната страна – списък от символи (може да е празен = epsilon)
+     * Създава ново правило
+     * @param left лявата страна - нетерминал
+     * @param right дясната страна - списък от символи (може да е празен за epsilon)
      */
     public Rule(NonTerminal left, List<Symbol> right) {
-        this.left = Objects.requireNonNull(left, "Лявата страна не може да е null.");
-        Objects.requireNonNull(right, "Дясната страна не може да е null – празен списък е ОК.");
-        // правим дефанзивно копие – така никой отвън не може да мутира вътрешния списък
+        this.left = Objects.requireNonNull(left, "Лявата страна не може да е null");
+        Objects.requireNonNull(right, "Дясната страна не може да е null");
         this.right = Collections.unmodifiableList(new ArrayList<>(right));
     }
 
@@ -40,26 +34,20 @@ public final class Rule {
     }
 
     /**
-     * @return дясната страна на правилото (имутабилен списък)
+     * @return дясната страна на правилото
      */
     public List<Symbol> getRight() {
         return right;
     }
 
     /**
-     * @return true ако правилото е epsilon-продукция (дясна страна = празен списък)
+     * @return true ако правилото е epsilon-продукция
      */
     public boolean isEpsilon() {
         return right.isEmpty();
     }
 
-    /**
-     * Текстово представяне от вида <code>A -&gt; a B C</code>. Символите от
-     * дясната страна се разделят с интервали за по-лесно четене при
-     * многосимволни нетерминали.
-     *
-     * @return човешко-четимо представяне на правилото
-     */
+    /** Връща текстово представяне от вида A -> a B C  */
     @Override
     public String toString() {
         String rightStr = right.isEmpty()

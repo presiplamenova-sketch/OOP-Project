@@ -7,21 +7,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Сервиз за "общи" операции върху една граматика.
- *
- * <p>Тук държим нещата, които не изискват сложни алгоритми – само прост печат
- * в четим формат и форматиране на правила с номерация. По-сложните алгоритми
- * живеят в {@link ChomskyService}, {@link CykService} и
- * {@link GrammarOperationsService}.</p>
+ * Сервиз за форматиране и визуализация на граматики
+ * Съдържа методи за показване на граматика в конзолата
  */
 public class GrammarService {
 
     /**
-     * Форматира граматика в четим многоредов вид с номерация на правилата,
-     * сортирани по реда им на добавяне.
-     *
-     * @param grammar граматиката за печат
-     * @return готов низ за показване на конзолата
+     * Форматира граматика в четим вид с номерирани правила
+     * @param grammar граматиката за показване
+     * @return форматиран низ за конзолата
      */
     public String formatForPrint(Grammar grammar) {
         StringBuilder sb = new StringBuilder();
@@ -47,10 +41,9 @@ public class GrammarService {
     }
 
     /**
-     * Кратко еднорядково описание – удобно за <code>list</code>.
-     *
-     * @param grammar граматиката
-     * @return низ от вида "#1  MyGrammar  (start: S, 5 правила)"
+     * Форматира граматика в кратък еднорядков вид за командата list
+     * @param grammar граматиката за показване
+     * @return кратко описание от вида #1 MyGrammar (start: S, 5 правила)
      */
     public String formatForList(Grammar grammar) {
         return String.format("#%d  %s  (start: %s, %d правила)",

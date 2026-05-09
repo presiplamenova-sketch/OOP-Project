@@ -11,39 +11,32 @@ import java.nio.file.Paths;
 import java.util.List;
 
 /**
- * Команда <code>open &lt;path&gt;</code>.
- *
- * <p>Отваря файл с граматики. Ако файлът съществува – зарежда всички граматики
- * от него в репозиторито. Ако не съществува – създава празна сесия, свързана с
- * този път (така следващото <code>save</code> ще работи).</p>
+ * Команда open <path> - отваря файл с граматики
+ * Ако файлът съществува зарежда граматиките от него
+ * Ако не съществува създава празна сесия свързана с този път
  */
 public class OpenCommand extends AbstractCommand {
 
-    /** {@inheritDoc} */
     @Override
     public String name() {
         return "open";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String description() {
-        return "Отваря файл с граматики (зарежда ги в паметта).";
+        return "Отваря файл с граматики и ги зарежда в паметта";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String usage() {
         return "open <path>";
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean requiresOpenFile() {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public CommandResult execute(CommandContext context, List<String> arguments) {
         requireArgs(arguments, 1);
@@ -51,14 +44,13 @@ public class OpenCommand extends AbstractCommand {
 
         if (context.isFileOpen()) {
             return CommandResult.error(
-                    "Вече има отворен файл (" + context.getCurrentFile().orElseThrow()
-                            + "). Изпълнете 'close' преди да отворите друг.");
+                    "Вече има отворен файл (" + context.getCurrentFile().orElseThrow()  + "). Изпълнете 'close' преди да отворите друг");
         }
 
         if (!Files.exists(path)) {
-            // не е грешка – разрешаваме създаване на нов файл
+            // файлът не съществува - създаваме празна сесия
             context.setCurrentFile(path);
-            return CommandResult.ok("Файлът не съществува. Създадена е празна сесия за '" + path + "'.");
+            return CommandResult.ok("Файлът не съществува. Създадена е празна сесия за '" + path + "'");
         }
 
         List<Grammar> loaded = context.getFileStorage()
@@ -67,6 +59,6 @@ public class OpenCommand extends AbstractCommand {
             context.getRepository().add(g);
         }
         context.setCurrentFile(path);
-        return CommandResult.ok("Отворен файл '" + path + "'. Заредени " + loaded.size() + " граматики.");
+        return CommandResult.ok("Отворен файл '" + path + "'. Заредени " + loaded.size() + " граматики");
     }
 }

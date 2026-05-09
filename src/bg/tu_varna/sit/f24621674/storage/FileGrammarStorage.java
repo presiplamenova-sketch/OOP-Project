@@ -10,51 +10,43 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-
 /**
- * Слой за четене и запис на граматики във/от файлове.
- *
- * <p>Адаптер между {@link GrammarFileParser} (който работи с низове)
- * и реалния файлов вход/изход. Всички I/O грешки се увиват в
- * {@link StorageException} със смислено съобщение на български.</p>
+ * Слой за четене и запис на граматики от и във файлове
+ * Всички грешки при работа с файлове се увиват в StorageException
  */
 public class FileGrammarStorage {
 
     private final GrammarFileParser fileParser;
 
     /**
-     * @param fileParser парсерът, с който ще се четат и пишат граматиките
+     * @param fileParser четецът за граматики който се използва вътрешно
      */
     public FileGrammarStorage(GrammarFileParser fileParser) {
         this.fileParser = fileParser;
     }
 
     /**
-     * Зарежда всички граматики от файл.
-     *
-     * @param path пътя до файла
+     * Зарежда всички граматики от файл
+     * @param path пътят до файла
      * @param idGenerator генератор за ID-та на новите граматики
-     * @return списък заредени граматики
-     * @throws StorageException при I/O грешки
+     * @return списък със заредените граматики
      */
     public List<Grammar> load(Path path, IdGenerator idGenerator) {
         try {
             if (!Files.exists(path)) {
-                throw new StorageException("Файлът '" + path + "' не съществува.");
+                throw new StorageException("Файлът '" + path + "' не съществува");
             }
             String content = Files.readString(path);
             return fileParser.parseAll(content, idGenerator);
         } catch (IOException e) {
-            throw new StorageException("Не може да се прочете файл '" + path + "'.", e);
+            throw new StorageException("Не може да се прочете файл '" + path + "'", e);
         }
     }
 
     /**
-     * Записва подадените граматики във файл, като ги сериализира с текущия парсер.
-     *
+     * Записва граматики във файл
      * @param grammars списък граматики за запис
      * @param path целевият файл
-     * @throws StorageException при I/O грешки
      */
     public void save(List<Grammar> grammars, Path path) {
         try {
@@ -64,15 +56,14 @@ public class FileGrammarStorage {
             String content = fileParser.serializeAll(grammars);
             Files.writeString(path, content);
         } catch (IOException e) {
-            throw new StorageException("Не може да се запише файл '" + path + "'.", e);
+            throw new StorageException("Не може да се запише файл '" + path + "'", e);
         }
     }
 
     /**
-     * Удобен метод за запис на една граматика в собствен файл.
-     *
-     * @param grammar граматиката
-     * @param path пътя до изходния файл
+     * Записва една граматика в отделен файл
+     * @param grammar граматиката за запис
+     * @param path пътят до изходния файл
      */
     public void saveSingle(Grammar grammar, Path path) {
         save(List.of(grammar), path);

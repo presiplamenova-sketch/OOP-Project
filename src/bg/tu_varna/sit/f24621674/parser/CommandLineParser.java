@@ -1,29 +1,23 @@
 package bg.tu_varna.sit.f24621674.parser;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Парсер за един ред команда от потребителя.
- *
- * <p>Принципът е прост: разделяме реда по интервали. Първият токен е името
- * на командата, останалите – нейните аргументи.</p>
- *
- * <p>Има едно специално правило: ако потребителят е написал
- * <code>save as &lt;path&gt;</code> (две думи), сливаме ги в <code>saveAs</code>.</p>
+ * Parses един ред команда въведена от потребителя
+ * Разделя реда по интервали - първият токен е командата останалите са аргументи
+ * Специален случай: "save as" се преобразува в "saveAs"
  */
 public class CommandLineParser {
 
     /**
-     * Носи резултата от парсването на един ред.
+     * Съдържа резултата от четенето на един ред
      */
     public record ParsedCommand(String name, List<String> arguments) {
         /**
-         * Връща броя аргументи.
-         * @return broй аргументи
+         * @return броят на аргументите
          */
         public int argCount() {
             return arguments.size();
@@ -31,11 +25,10 @@ public class CommandLineParser {
     }
 
     /**
-     * Парсва един ред в команда + аргументи. Връща <code>null</code> ако
-     * редът е празен или състои се само от whitespace.
-     *
+     * Parses един ред в команда и аргументи
+     * Връща null ако редът е празен
      * @param line въведеният ред
-     * @return парснатата команда или null при празен вход
+     * @return прочетената команда или null при празен вход
      */
     public ParsedCommand parse(String line) {
         if (line == null) {
@@ -50,7 +43,7 @@ public class CommandLineParser {
         String name = parts[0];
         List<String> args = new ArrayList<>(Arrays.asList(parts).subList(1, parts.length));
 
-        // специален случай: "save as ..." -> "saveAs ..."
+        // "save as" се преобразува в "saveAs"
         if (name.equalsIgnoreCase("save") && !args.isEmpty() && args.get(0).equalsIgnoreCase("as")) {
             name = "saveAs";
             args.remove(0);

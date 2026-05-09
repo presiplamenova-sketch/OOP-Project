@@ -1,6 +1,5 @@
 package bg.tu_varna.sit.f24621674.parser;
 
-
 import bg.tu_varna.sit.f24621674.exception.InvalidRuleException;
 import bg.tu_varna.sit.f24621674.model.NonTerminal;
 import bg.tu_varna.sit.f24621674.model.Rule;
@@ -13,39 +12,28 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Парсер за правило от текстов вид в обект {@link Rule}.
- *
- * <p>Поддържа два стила на писане:</p>
- * <ul>
- *   <li><b>Компактен</b> (без интервали отдясно): <code>S-&gt;aA</code> – всеки
- *       символ е отделна буква/цифра.</li>
- *   <li><b>С интервали</b>: <code>S -&gt; a A X1</code> – символите са разделени,
- *       позволени са многосимволни нетерминали (напр. генерирани при CNF).</li>
- * </ul>
- *
- * <p>Празна дясна страна, <code>ε</code>, <code>eps</code> или <code>_</code>
- * означават epsilon-продукция.</p>
+ * Parses текстово правило в обект Rule
+ * Поддържа компактен синтаксис (S->aA) и разделен синтаксис (S -> a A)
+ * Празна дясна страна ε eps или _ означават epsilon-продукция
  */
 public class RuleParser {
 
-    /** Разделителят между ляво и дясно. */
+    /** Разделителят между лява и дясна страна */
     private static final String ARROW = "->";
 
     /**
-     * Парсва един текстов ред до {@link Rule}.
-     *
+     * Parses един текстов ред в обект Rule
      * @param input низ с правило
-     * @return нов {@link Rule}
-     * @throws InvalidRuleException при всякакви синтактични грешки
+     * @return новият Rule обект
      */
     public Rule parse(String input) {
         if (input == null) {
-            throw new InvalidRuleException("Липсващ вход за правило.");
+            throw new InvalidRuleException("Липсващ вход за правило");
         }
         String trimmed = input.trim();
         int arrowIdx = trimmed.indexOf(ARROW);
         if (arrowIdx < 0) {
-            throw new InvalidRuleException("Липсва оператор '->' в '" + input + "'.");
+            throw new InvalidRuleException("Липсва оператор '->' в '" + input + "'");
         }
         String leftStr = trimmed.substring(0, arrowIdx).trim();
         String rightStr = trimmed.substring(arrowIdx + ARROW.length()).trim();
@@ -56,24 +44,23 @@ public class RuleParser {
     }
 
     /**
-     * Парсва лявата страна – точно един нетерминал.
-     * @param leftStr низ, който би трябвало да е име на нетерминал
-     * @return съответният {@link NonTerminal}
+     * Parses лявата страна - точно един нетерминал
+     * @param leftStr низ с името на нетерминала
+     * @return съответният NonTerminal обект
      */
     private NonTerminal parseLeft(String leftStr) {
         if (leftStr.isEmpty()) {
-            throw new InvalidRuleException("Лявата страна е празна.");
+            throw new InvalidRuleException("Лявата страна е празна");
         }
-        // може да е едно- или многосимволно име, но трябва да е валиден нетерминал
         if (!SymbolUtils.isNonTerminalToken(leftStr)) {
             throw new InvalidRuleException(
-                    "Лявата страна '" + leftStr + "' не е валиден нетерминал.");
+                    "Лявата страна '" + leftStr + "' не е валиден нетерминал");
         }
         return new NonTerminal(leftStr);
     }
 
     /**
-     * Парсва дясната страна – връща списък от символи (евентуално празен за epsilon).
+     * Parses дясната страна и връща списък от символи
      * @param rightStr низ на дясната страна
      * @return списък от символи
      */
@@ -88,15 +75,13 @@ public class RuleParser {
     }
 
     /**
-     * Парсира дясна страна, в която символите са разделени с интервали
-     * (позволяваме многосимволни имена).
+     * Parses дясна страна в която символите са разделени с интервали
      */
     private List<Symbol> parseSpaced(String rightStr) {
         List<Symbol> result = new ArrayList<>();
         String[] tokens = rightStr.split("\\s+");
         for (String token : Arrays.stream(tokens).filter(s -> !s.isEmpty()).toList()) {
             if (SymbolUtils.isEpsilonToken(token)) {
-                // явен epsilon токен в средата е странно, но не го броим като символ
                 continue;
             }
             if (SymbolUtils.isNonTerminalToken(token)) {
@@ -105,15 +90,14 @@ public class RuleParser {
                 result.add(new Terminal(token));
             } else {
                 throw new InvalidRuleException(
-                        "Токенът '" + token + "' не е нито терминал, нито нетерминал.");
+                        "Токенът '" + token + "' не е нито терминал нито нетерминал");
             }
         }
         return result;
     }
 
     /**
-     * Парсира дясна страна в компактен формат – всеки символ е един знак
-     * (главна буква => нетерминал, малка/цифра => терминал).
+     * Parses дясна страна в компактен формат - всеки символ е един знак
      */
     private List<Symbol> parseCompact(String rightStr) {
         List<Symbol> result = new ArrayList<>();
@@ -124,11 +108,10 @@ public class RuleParser {
             } else if (SymbolUtils.isTerminalChar(c)) {
                 result.add(new Terminal(String.valueOf(c)));
             } else if (Character.isWhitespace(c)) {
-                // не очакваме, но сме толерантни
                 continue;
             } else {
                 throw new InvalidRuleException(
-                        "Неразпознат символ '" + c + "' в '" + rightStr + "'.");
+                        "Неразпознат символ '" + c + "' в '" + rightStr + "'");
             }
         }
         return result;

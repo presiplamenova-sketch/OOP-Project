@@ -11,35 +11,26 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Имплементация на алгоритъма CYK (Cocke-Younger-Kasami).
- *
- * <p>CYK приема граматика в НФЧ и дума w; отговаря на въпроса дали
- * <code>w ∈ L(G)</code>. Ако подадената граматика не е в НФЧ, този сервиз
- * я преобразува с помощта на {@link ChomskyService} и работи върху новата.</p>
- *
- * <p>Алгоритъмът попълва матрица <code>T[i][j]</code> от множества от
- * нетерминали, където <code>T[i][j]</code> = множеството от нетерминали,
- * които извеждат подниза <code>w[i..j]</code> (индексирани от 0, включително j).</p>
- *
- * <p>Сложност: O(n³ · |G|) по време, O(n²) по памет, където n = |w|.</p>
+ * Сервиз за алгоритъма CYK (Cocke-Younger-Kasami)
+ * Проверява дали дума принадлежи на езика на граматика
+ * Ако граматиката не е в НФЧ тя се преобразува автоматично
  */
 public class CykService {
 
     private final ChomskyService chomskyService;
 
     /**
-     * @param chomskyService използва се за конверсия до НФЧ при нужда
+     * @param chomskyService използва се за преобразуване до НФЧ при нужда
      */
     public CykService(ChomskyService chomskyService) {
         this.chomskyService = chomskyService;
     }
 
     /**
-     * Проверява дали думата принадлежи на езика на граматиката.
-     *
-     * @param grammar граматика (не е задължително в НФЧ)
-     * @param word дума, която искаме да проверим (низ от терминали)
-     * @return true ако <code>word ∈ L(grammar)</code>
+     * Проверява дали думата принадлежи на езика на граматиката
+     * @param grammar граматиката за проверка
+     * @param word думата която искаме да проверим
+     * @return true ако думата принадлежи на езика
      */
     public boolean belongs(Grammar grammar, String word) {
         Grammar cnf = chomskyService.isInChomskyNormalForm(grammar)
@@ -50,13 +41,13 @@ public class CykService {
             word = "";
         }
 
-        // Специален случай: празна дума
+        // проверка за празна дума
         if (word.isEmpty()) {
             return hasStartEpsilon(cnf);
         }
 
         int n = word.length();
-        // T[i][j] – множество от нетерминали, извеждащи word[i..j]
+        // T[i][j] съдържа нетерминалите които извеждат word[i..j]
         @SuppressWarnings("unchecked")
         Set<NonTerminal>[][] table = new HashSet[n][n];
         for (int i = 0; i < n; i++) {
@@ -65,7 +56,7 @@ public class CykService {
             }
         }
 
-        // базова стъпка – единични символи
+        // базова стъпка - единични символи
         for (int i = 0; i < n; i++) {
             Terminal t = new Terminal(String.valueOf(word.charAt(i)));
             for (Rule r : cnf.getRules()) {
@@ -75,7 +66,7 @@ public class CykService {
             }
         }
 
-        // индуктивна стъпка – дължини от 2 до n
+        // индуктивна стъпка - дължини от 2 до n
         for (int length = 2; length <= n; length++) {
             for (int i = 0; i <= n - length; i++) {
                 int j = i + length - 1;
@@ -104,7 +95,7 @@ public class CykService {
     }
 
     /**
-     * @return true ако стартовият символ има директна ε-продукция
+     * Проверява дали стартовият символ има epsilon продукция
      */
     private boolean hasStartEpsilon(Grammar cnf) {
         NonTerminal start = cnf.getStartSymbol();

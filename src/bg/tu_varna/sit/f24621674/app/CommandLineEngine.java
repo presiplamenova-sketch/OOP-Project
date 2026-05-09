@@ -14,14 +14,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Главният цикъл на командния интерфейс.
- *
- * <p>Чете ред по ред от стандартния вход, парси чрез {@link CommandLineParser},
- * резолва командата от регистъра в {@link CommandContext} и я изпълнява.
- * Резултатът се извежда чрез {@link ConsoleIO}.</p>
- *
- * <p>Цикълът приключва когато потребителят зададе exit или входният поток
- * приключи (Ctrl+D / EOF).</p>
+ * Главен цикъл на командния интерфейс
+ * Чете команди от конзолата, изпълнява ги и показва резултата
+ * Спира когато потребителят напише exit или затвори входния поток
  */
 public class CommandLineEngine {
 
@@ -40,7 +35,8 @@ public class CommandLineEngine {
     }
 
     /**
-     * Стартира главния цикъл. Връща се само при exit.
+     * Стартира главния цикъл
+     * Спира само при exit или край на входния поток
      */
     public void run() {
         printWelcome();
@@ -65,9 +61,8 @@ public class CommandLineEngine {
 
     /**
      * Изпълнява една команда от текстов ред. Изнесено в отделен метод
-     * специално за да може да се ползва от unit тестове.
-     *
-     * @param line ред от потребителя
+     * специално за да може да се ползва от unit тестове
+     * @param line ред въведен от потребителя
      */
     public void executeLine(String line) {
         CommandLineParser.ParsedCommand parsed = parser.parse(line);
@@ -95,16 +90,15 @@ public class CommandLineEngine {
         }
     }
 
-    /**
-     * Извежда поздрав и кратки инструкции в началото.
-     */
+    /** Показва съобщение при стартиране   */
     private void printWelcome() {
         console.println("  CFG TOOL – Контекстно-свободни граматики");
         console.println("  Напишете 'help' за списък с команди.");
     }
 
     /**
-     * Промптът показва дали има отворен файл – подобрява UX-а.
+     * Показва текущото състояние в промпта
+     * Ако има отворен файл показва неговото име
      */
     private String prompt() {
         if (context.isFileOpen()) {

@@ -8,35 +8,30 @@ import bg.tu_varna.sit.f24621674.model.Grammar;
 import java.util.List;
 
 /**
- * Команда <code>iter &lt;id&gt;</code> – генерира звезда на Клини на даден език.
+ * Команда iter <id> - създава нова граматика за звездата на Клини
  */
 public class IterCommand extends AbstractCommand {
 
-    /** {@inheritDoc} */
     @Override
     public String name() {
         return "iter";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String description() {
-        return "Генерира нова граматика за итерацията (звезда на Клини) на езика.";
+        return "Създава нова граматика за звездата на Клини на езика";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String usage() {
         return "iter <id>";
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean requiresOpenFile() {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public CommandResult execute(CommandContext context, List<String> arguments) {
         requireArgs(arguments, 1);
@@ -45,6 +40,6 @@ public class IterCommand extends AbstractCommand {
         Grammar result = context.getOperationsService().iter(g);
         context.getRepository().add(result);
         return CommandResult.ok("Създадена нова граматика #" + result.getId()
-                + " = Iter(#" + id + ").");
+                + " = Iter(#" + id + ")");
     }
 }

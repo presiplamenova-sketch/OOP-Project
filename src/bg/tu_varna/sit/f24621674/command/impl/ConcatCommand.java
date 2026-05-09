@@ -9,36 +9,30 @@ import bg.tu_varna.sit.f24621674.model.Grammar;
 import java.util.List;
 
 /**
- * Команда <code>concat &lt;id1&gt; &lt;id2&gt;</code> – създава нова граматика
- * чийто език е конкатенацията L(g1)·L(g2).
+ * Команда <code>concat &lt;id1&gt; &lt;id2&gt;</code> – създава нова граматика чийто език е конкатенацията L(g1)·L(g2).
  */
 public class ConcatCommand extends AbstractCommand {
 
-    /** {@inheritDoc} */
     @Override
     public String name() {
         return "concat";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String description() {
         return "Конкатенира езиците на две граматики в нова.";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String usage() {
         return "concat <id1> <id2>";
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean requiresOpenFile() {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public CommandResult execute(CommandContext context, List<String> arguments) {
         requireArgs(arguments, 2);

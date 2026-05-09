@@ -9,48 +9,40 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Команда <code>help</code> – извежда списък с всички налични команди и
- * техния синтаксис.
- *
- * <p>Командата ползва регистъра, за да открие всички останали – така остава
- * винаги в синхрон, дори когато добавим нова команда.</p>
+ * Команда help - показва списък с всички налични команди
+ * Информацията се взима директно от регистъра на командите така че списъкът винаги е актуален
  */
 public class HelpCommand extends AbstractCommand {
 
-    /** {@inheritDoc} */
     @Override
     public String name() {
         return "help";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String description() {
-        return "Извежда списък на всички команди.";
+        return "Показва списък с всички налични команди";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String usage() {
         return "help";
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean requiresOpenFile() {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public CommandResult execute(CommandContext context, List<String> arguments) {
         Collection<Command> commands = context.getCommandRegistry().all();
         StringBuilder sb = new StringBuilder();
         sb.append("Налични команди:\n");
         for (Command c : commands) {
-            sb.append(String.format("  %-25s - %s%n", c.usage(), c.description()));
+            sb.append("  ").append(c.usage()).append(" - ").append(c.description()).append("\n");
         }
-        sb.append("\nПодсказка: команди като 'addRule', 'cyk', 'union' изискват вече отворен файл.");
+        sb.append("\nПодсказка: команди като 'addRule', 'cyk', 'union' изискват отворен файл");
         return CommandResult.ok(sb.toString());
     }
 }

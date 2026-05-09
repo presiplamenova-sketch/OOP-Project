@@ -1,8 +1,7 @@
 package bg.tu_varna.sit.f24621674.exception;
 
 /**
- * Хвърля се, когато потребителят се опита да достъпи граматика по ID,
- * което не съществува в репозиторито.
+ * Възниква когато граматика с търсеното ID не съществува
  */
 public class GrammarNotFoundException extends CfgException {
 
@@ -10,6 +9,6 @@ public class GrammarNotFoundException extends CfgException {
      * @param id липсващото ID
      */
     public GrammarNotFoundException(int id) {
-        super("Не съществува граматика с ID " + id + ".");
+        super("Не съществува граматика с ID " + id);
     }
 }

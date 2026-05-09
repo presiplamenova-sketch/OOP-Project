@@ -8,36 +8,30 @@ import bg.tu_varna.sit.f24621674.model.Grammar;
 import java.util.List;
 
 /**
- * Команда <code>union &lt;id1&gt; &lt;id2&gt;</code> – създава нова граматика,
- * чийто език е обединението на двата.
+ * Команда union <id1> <id2> - създава нова граматика чийто език е обединението на двата езика
  */
 public class UnionCommand extends AbstractCommand {
 
-    /** {@inheritDoc} */
     @Override
     public String name() {
         return "union";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String description() {
-        return "Обединява два езика в нова граматика.";
+        return "Обединява два езика в нова граматика";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String usage() {
         return "union <id1> <id2>";
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean requiresOpenFile() {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public CommandResult execute(CommandContext context, List<String> arguments) {
         requireArgs(arguments, 2);
@@ -48,6 +42,6 @@ public class UnionCommand extends AbstractCommand {
         Grammar result = context.getOperationsService().union(g1, g2);
         context.getRepository().add(result);
         return CommandResult.ok("Създадена нова граматика #" + result.getId()
-                + " = Union(#" + id1 + ", #" + id2 + ").");
+                + " = Union(#" + id1 + ", #" + id2 + ")");
     }
 }

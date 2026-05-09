@@ -11,31 +11,26 @@ import java.util.List;
  */
 public class CloseCommand extends AbstractCommand {
 
-    /** {@inheritDoc} */
     @Override
     public String name() {
         return "close";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String description() {
         return "Затваря текущия файл и изчиства заредените граматики.";
     }
 
-    /** {@inheritDoc} */
     @Override
     public String usage() {
         return "close";
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean requiresOpenFile() {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public CommandResult execute(CommandContext context, List<String> arguments) {
         requireArgs(arguments, 0);

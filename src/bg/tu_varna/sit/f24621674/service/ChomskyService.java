@@ -17,56 +17,33 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Сервиз за работа с нормална форма на Чомски (НФЧ / CNF).
- *
- * <p>Граматиката е в НФЧ, ако всяко правило е в един от следните видове:</p>
- * <ul>
- *   <li><code>A → BC</code> (точно два нетерминала отдясно);</li>
- *   <li><code>A → a</code> (точно един терминал отдясно);</li>
- *   <li><code>S → ε</code> (само за стартовия символ, ако ε ∈ L).
- *       При това стартовият символ не трябва да се появява в нито една дясна
- *       страна – обикновено се въвежда нов стартов символ S0.</li>
- * </ul>
- *
- * <p>За преобразуването се използва класически подход, разделен на стъпки:</p>
- * <ol>
- *   <li>START – вкарва се нов стартов символ S0 → S, ако S се среща в дясна страна.</li>
- *   <li>DEL – премахват се ε-продукциите (с изключение на S0 → ε, ако е необходимо).</li>
- *   <li>UNIT – премахват се единичните продукции A → B.</li>
- *   <li>TERM – в правила с дясна страна с дължина ≥ 2 всеки терминал се заменя
- *       с нов нетерминал T_a и се добавя T_a → a.</li>
- *   <li>BIN – правила с дясна страна дължина &gt; 2 се разбиват на бинарни.</li>
- * </ol>
- *
- * <p>Забележка: това е реална имплементация, но за много големи граматики
- * резултатите могат да растат експоненциално (най-вече при DEL стъпката). За
- * учебни/демонстрационни размери работи коректно.</p>
+ * Сервиз за работа с нормална форма на Чомски
+ * Граматиката е в НФЧ ако всяко правило е от вид A->BC или A->a
+ * Преобразуването минава през стъпки START DEL UNIT TERM BIN
  */
 public class ChomskyService {
 
     private final IdGenerator idGenerator;
 
     /**
-     * @param idGenerator източник на ID-та за новата CNF граматика
+     * @param idGenerator източник на ID-та за новата граматика
      */
     public ChomskyService(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
     }
 
     /**
-     * Проверява дали подадената граматика е в нормална форма на Чомски.
-     *
-     * @param g граматика
+     * Проверява дали граматиката е в нормална форма на Чомски
+     * @param g граматиката за проверка
      * @return true ако е в НФЧ
      */
     public boolean isInChomskyNormalForm(Grammar g) {
         NonTerminal start = g.getStartSymbol();
-        // (По желание) проверяваме, че стартът не се среща в дясна страна при S→ε
         boolean hasStartEpsilon = g.getRules().stream()
                 .anyMatch(r -> r.getLeft().equals(start) && r.isEpsilon());
 
         if (hasStartEpsilon) {
-            // за строга НФЧ стартът не бива да е в дясна страна
+            // стартовият символ не трябва да се среща в дясна страна
             for (Rule r : g.getRules()) {
                 for (Symbol s : r.getRight()) {
                     if (s.equals(start)) {
@@ -79,7 +56,7 @@ public class ChomskyService {
         for (Rule r : g.getRules()) {
             List<Symbol> rhs = r.getRight();
             if (rhs.isEmpty()) {
-                // позволено само за стартовия
+                // epsilon е позволено само за стартовия символ
                 if (!r.getLeft().equals(start)) {
                     return false;
                 }
@@ -89,7 +66,7 @@ public class ChomskyService {
                     return false;
                 }
             } else if (rhs.size() == 2) {
-                // двата са нетерминали
+                // двата символа трябва да са нетерминали
                 if (!rhs.get(0).isNonTerminal() || !rhs.get(1).isNonTerminal()) {
                     return false;
                 }
@@ -101,14 +78,12 @@ public class ChomskyService {
     }
 
     /**
-     * Преобразува граматика до НФЧ. Връща нова граматика – оригиналната
-     * не се мутира.
-     *
-     * @param source изходна граматика
+     * Преобразува граматика до НФЧ и връща нова граматика
+     * Оригиналната граматика не се променя
+     * @param source изходната граматика
      * @return нова граматика в НФЧ
      */
     public Grammar toChomskyNormalForm(Grammar source) {
-        // работим с mutable списък правила – ще правим много стъпки
         List<Rule> rules = new ArrayList<>();
         for (Rule r : source.getRules()) {
             rules.add(new Rule(r.getLeft(), new ArrayList<>(r.getRight())));
@@ -116,29 +91,27 @@ public class ChomskyService {
         NonTerminal start = source.getStartSymbol();
         Set<String> usedNames = collectUsedNames(rules, start);
 
-        // --- 1) START: ако старт се среща в дясна страна, добавяме нов старт ---
+        // 1) START - добавяме нов стартов символ ако е нужно
         if (startAppearsOnRight(rules, start)) {
             NonTerminal newStart = fresh(usedNames, "S0");
             rules.add(0, new Rule(newStart, List.of(start)));
             start = newStart;
         }
 
-        // --- 2) DEL: премахване на ε-продукциите ---
+        // 2 - DEL - премахваме epsilon продукциите
         rules = eliminateEpsilonRules(rules, start);
 
-        // --- 3) UNIT: премахване на единичните продукции ---
+        // 3 - UNIT - премахваме единичните продукции
         rules = eliminateUnitRules(rules);
 
-        // --- 4) TERM: в дълги правила заменяме терминалите с нови нетерминали ---
+        // 4 - TERM - заменяме терминалите в дълги правила
         rules = replaceTerminalsInLongRules(rules, usedNames);
 
-        // --- 5) BIN: разбиваме дълги правила на бинарни ---
+        // 5- BIN - разбиваме дългите правила на бинарни
         rules = binarize(rules, usedNames);
 
-        // премахваме дубликати, запазвайки ред
         rules = dedup(rules);
 
-        // строим нова граматика
         Grammar result = new Grammar(idGenerator.nextId(),
                 "CNF(" + source.getName() + ")", start);
         for (Rule r : rules) {
@@ -147,7 +120,9 @@ public class ChomskyService {
         return result;
     }
 
-
+    /**
+     * Събира имената на всички нетерминали в граматиката
+     */
     private Set<String> collectUsedNames(List<Rule> rules, NonTerminal start) {
         Set<String> used = new LinkedHashSet<>();
         used.add(start.getValue());
@@ -162,6 +137,9 @@ public class ChomskyService {
         return used;
     }
 
+    /**
+     * Проверява дали стартовият символ се среща в дясна страна на правило
+     */
     private boolean startAppearsOnRight(List<Rule> rules, NonTerminal start) {
         for (Rule r : rules) {
             for (Symbol s : r.getRight()) {
@@ -173,6 +151,9 @@ public class ChomskyService {
         return false;
     }
 
+    /**
+     * Генерира нов нетерминал чието име не се среща в използваните имена
+     */
     private NonTerminal fresh(Set<String> used, String base) {
         if (!used.contains(base)) {
             used.add(base);
@@ -190,7 +171,7 @@ public class ChomskyService {
     }
 
     /**
-     * Намира всички "nullable" нетерминали – такива, за които A ⇒* ε.
+     * Намира всички nullable нетерминали за които A =>* epsilon
      */
     private Set<NonTerminal> findNullable(List<Rule> rules) {
         Set<NonTerminal> nullable = new HashSet<>();
@@ -218,9 +199,8 @@ public class ChomskyService {
     }
 
     /**
-     * Премахва ε-продукциите. За всяко правило A → α генерира всички
-     * комбинации, в които nullable символи присъстват или липсват.
-     * Запазва S → ε ако стартовият символ е nullable.
+     * Премахва epsilon продукциите и генерира всички комбинации без nullable символи
+     * Запазва S->epsilon ако стартовият символ е nullable
      */
     private List<Rule> eliminateEpsilonRules(List<Rule> rules, NonTerminal start) {
         Set<NonTerminal> nullable = findNullable(rules);
@@ -229,13 +209,12 @@ public class ChomskyService {
 
         for (Rule r : rules) {
             if (r.isEpsilon()) {
-                // запазваме само S → ε, ако стартът е nullable
                 continue;
             }
             List<List<Symbol>> expansions = expandNullable(r.getRight(), nullable);
             for (List<Symbol> rhs : expansions) {
                 if (rhs.isEmpty()) {
-                    continue; // ε продукциите ги пускаме отделно
+                    continue;
                 }
                 Rule nr = new Rule(r.getLeft(), rhs);
                 if (seen.add(nr)) {
@@ -253,11 +232,9 @@ public class ChomskyService {
     }
 
     /**
-     * Генерира всички комбинации на дясна страна, в които можем да изтрием
-     * подмножество от позициите, заемани от nullable нетерминали.
+     * Генерира всички комбинации на дясна страна с и без nullable символи
      */
     private List<List<Symbol>> expandNullable(List<Symbol> rhs, Set<NonTerminal> nullable) {
-        // събираме индексите на nullable нетерминалите
         List<Integer> nullableIdx = new ArrayList<>();
         for (int i = 0; i < rhs.size(); i++) {
             Symbol s = rhs.get(i);
@@ -269,7 +246,6 @@ public class ChomskyService {
         int subsets = 1 << k;
         List<List<Symbol>> out = new ArrayList<>();
         for (int mask = 0; mask < subsets; mask++) {
-            // mask битовете = "оставяме", 0 = "махаме"
             Set<Integer> keep = new HashSet<>();
             for (int b = 0; b < k; b++) {
                 if ((mask & (1 << b)) != 0) {
@@ -282,7 +258,6 @@ public class ChomskyService {
                     if (keep.contains(i)) {
                         newRhs.add(rhs.get(i));
                     }
-                    // иначе пропускаме
                 } else {
                     newRhs.add(rhs.get(i));
                 }
@@ -293,11 +268,9 @@ public class ChomskyService {
     }
 
     /**
-     * Премахва единични продукции A → B. За всяка двойка (A, B), за която
-     * A ⇒* B само чрез единични правила, прехвърля неединичните правила на B към A.
+     * Премахва единичните продукции A->B като прехвърля правилата на B към A
      */
     private List<Rule> eliminateUnitRules(List<Rule> rules) {
-        // 1) намираме за всеки A множеството unit-reachable нетерминали
         Map<NonTerminal, Set<NonTerminal>> unitReach = new HashMap<>();
         Set<NonTerminal> allNT = new LinkedHashSet<>();
         for (Rule r : rules) {
@@ -334,7 +307,6 @@ public class ChomskyService {
                     if (!r.getLeft().equals(b)) {
                         continue;
                     }
-                    // прескачаме единичните – те са "unit", не копираме
                     if (r.getRight().size() == 1 && r.getRight().get(0).isNonTerminal()) {
                         continue;
                     }
@@ -349,8 +321,7 @@ public class ChomskyService {
     }
 
     /**
-     * В правила с дясна страна с дължина ≥ 2, заменя всеки терминал с нов
-     * нетерминал T_x и добавя правило T_x → x (ако още не е добавено).
+     * Заменя терминалите в дълги правила с нови нетерминали
      */
     private List<Rule> replaceTerminalsInLongRules(List<Rule> rules, Set<String> used) {
         Map<Terminal, NonTerminal> termToNT = new HashMap<>();
@@ -382,8 +353,8 @@ public class ChomskyService {
     }
 
     /**
-     * Превръща правила с дясна страна > 2 в поредица от бинарни правила.
-     * Пример: A → B C D E става A → B X1, X1 → C X2, X2 → D E.
+     * Разбива правила с повече от два символа на бинарни правила
+     * Пример: A->BCDE става A->BX1 X1->CX2 X2->DE
      */
     private List<Rule> binarize(List<Rule> rules, Set<String> used) {
         List<Rule> out = new ArrayList<>();
@@ -394,24 +365,23 @@ public class ChomskyService {
             }
             List<Symbol> rhs = r.getRight();
             NonTerminal left = r.getLeft();
-            // A → s0 X1
             NonTerminal x = fresh(used, "X");
             out.add(new Rule(left, Arrays.asList(rhs.get(0), x)));
-            // средните
             for (int i = 1; i < rhs.size() - 2; i++) {
                 NonTerminal nextX = fresh(used, "X");
                 out.add(new Rule(x, Arrays.asList(rhs.get(i), nextX)));
                 x = nextX;
             }
-            // последното: Xk → s_{n-2} s_{n-1}
             out.add(new Rule(x, Arrays.asList(rhs.get(rhs.size() - 2), rhs.get(rhs.size() - 1))));
         }
         return out;
     }
 
+    /**
+     * Премахва дублиращи се правила
+     */
     private List<Rule> dedup(List<Rule> rules) {
         Set<Rule> seen = new LinkedHashSet<>(rules);
         return new ArrayList<>(seen);
     }
 }
-

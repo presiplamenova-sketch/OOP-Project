@@ -13,14 +13,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * Контекстът, който всяка команда получава при изпълнение.
- *
- * <p>Съдържа всички инжектирани зависимости (services, repository, console)
- * плюс състоянието, което е "общосесийно" – напр. кой е текущо отвореният файл.
- * Така всяка команда остава малка и не строи сама service-ите.</p>
- *
- * <p>Това е умишлено <b>не-god-class</b>: класът само държи препратки,
- * не прави нищо друго.</p>
+ * Контекст който всяка команда получава при изпълнение
+ * Съдържа всички сервизи и текущото състояние на сесията
  */
 public class CommandContext {
 
@@ -37,26 +31,20 @@ public class CommandContext {
     private boolean exitRequested;
 
     /**
-     * Конструкторът приема всички зависимости наведнъж.
-     * Построяването става централно в {@link bg.uni.fmi.cfg.app.ApplicationBootstrap}.
+     * Приема всички зависимости наведнъж
      *
      * @param repository хранилището на граматики
-     * @param fileStorage слоят за файлово четене/писане
-     * @param grammarService услуги за печат/форматиране
-     * @param operationsService union/concat/iter/empty
-     * @param chomskyService CNF операции
-     * @param cykService CYK алгоритъм
+     * @param fileStorage слой за файлово четене и писане
+     * @param grammarService сервиз за печат и форматиране
+     * @param operationsService сервиз за union concat iter empty
+     * @param chomskyService сервиз за НФЧ операции
+     * @param cykService сервиз за CYK алгоритъм
      * @param console обвивка на конзолата
-     * @param commandRegistry регистър на всички команди (нужен е на HelpCommand)
+     * @param commandRegistry регистър на всички команди
      */
-    public CommandContext(GrammarRepository repository,
-                          FileGrammarStorage fileStorage,
-                          GrammarService grammarService,
-                          GrammarOperationsService operationsService,
-                          ChomskyService chomskyService,
-                          CykService cykService,
-                          ConsoleIO console,
-                          CommandRegistry commandRegistry) {
+    public CommandContext(GrammarRepository repository, FileGrammarStorage fileStorage,
+    GrammarService grammarService, GrammarOperationsService operationsService, ChomskyService chomskyService,
+    CykService cykService, ConsoleIO console, CommandRegistry commandRegistry) {
         this.repository = repository;
         this.fileStorage = fileStorage;
         this.grammarService = grammarService;
@@ -77,69 +65,62 @@ public class CommandContext {
         return fileStorage;
     }
 
-    /** @return общ сервиз за граматики (печат и т.н.) */
+    /** @return сервиз за форматиране на граматики  */
     public GrammarService getGrammarService() {
         return grammarService;
     }
 
-    /** @return сервиз за union/concat/iter/empty */
+    /** @return сервиз за union concat iter empty */
     public GrammarOperationsService getOperationsService() {
         return operationsService;
     }
 
-    /** @return сервиз за CNF операции */
+    /** @return сервиз за НФЧ операции */
     public ChomskyService getChomskyService() {
         return chomskyService;
     }
 
-    /** @return сервиз за CYK */
+    /** @return сервиз за CYK алгоритъм */
     public CykService getCykService() {
         return cykService;
     }
 
-    /** @return конзолен IO */
+    /** @return конзолен IO  */
     public ConsoleIO getConsole() {
         return console;
     }
 
-    /** @return регистърът с команди (нужен е само на HelpCommand) */
+    /** @return регистърът с всички команди */
     public CommandRegistry getCommandRegistry() {
         return commandRegistry;
     }
 
-    /** @return текущо отворения файл, ако има такъв */
+    /** @return текущо отворения файл ако има такъв  */
     public Optional<Path> getCurrentFile() {
         return Optional.ofNullable(currentFile);
     }
 
-    /**
-     * Задава текущия файл – извиква се от open/save as.
-     * @param file пътят до файла
-     */
+    /** Задава текущия файл @param file пътят до файла  */
     public void setCurrentFile(Path file) {
         this.currentFile = file;
     }
 
-    /**
-     * Премахва маркера за "отворен файл".
-     */
+    /** Премахва текущия файл   */
     public void clearCurrentFile() {
         this.currentFile = null;
     }
 
-    /** @return true ако има отворен файл */
+    /** @return true ако има отворен файл  */
     public boolean isFileOpen() {
         return currentFile != null;
     }
 
-    /** @return true ако е подадена команда <code>exit</code> */
+    /** @return true ако е подадена команда exit  */
     public boolean isExitRequested() {
         return exitRequested;
     }
 
-    /**
-     * Маркира за излизане – CLI engine ще завърши главния цикъл.
-     */
+    /** Маркира програмата за излизане  */
     public void requestExit() {
         this.exitRequested = true;
     }

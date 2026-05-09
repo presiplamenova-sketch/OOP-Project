@@ -1,12 +1,8 @@
 package bg.tu_varna.sit.f24621674.command;
 
-
 /**
- * Резултат от изпълнение на команда.
- *
- * <p>Използва се за структуриран отговор – успех/грешка + съобщение.
- * {@link bg.tu_varna.sit.f24621674.command} може да реши какво да
- * направи с резултата (принципно само го принтира).</p>
+ * Резултат от изпълнение на команда
+ * Съдържа информация дали командата е успешна и съобщение за потребителя
  */
 public final class CommandResult {
 
@@ -19,9 +15,8 @@ public final class CommandResult {
     }
 
     /**
-     * Фабричен метод за успешен резултат.
-     *
-     * @param message съобщение (може да е празно ако командата е "тиха")
+     * Създава успешен резултат със съобщение
+     * @param message съобщение за потребителя
      * @return нов резултат
      */
     public static CommandResult ok(String message) {
@@ -29,8 +24,7 @@ public final class CommandResult {
     }
 
     /**
-     * Фабричен метод за успех без съобщение.
-     *
+     * Създава успешен резултат без съобщение
      * @return нов резултат
      */
     public static CommandResult ok() {
@@ -38,8 +32,7 @@ public final class CommandResult {
     }
 
     /**
-     * Фабричен метод за неуспешен резултат.
-     *
+     * Създава неуспешен резултат със съобщение за грешка
      * @param message причина за грешката
      * @return нов резултат
      */
@@ -47,14 +40,13 @@ public final class CommandResult {
         return new CommandResult(false, message);
     }
 
-    /** @return true ако е успех */
+    /** @return true ако командата е изпълнена успешно  */
     public boolean isSuccess() {
         return success;
     }
 
-    /** @return съобщението на резултата */
+    /** @return съобщението на резултата  */
     public String getMessage() {
         return message;
     }
 }
-

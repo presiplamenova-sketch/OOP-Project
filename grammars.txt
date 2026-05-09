@@ -1,0 +1,6 @@
+GRAMMAR TestGrammar
+START S
+S -> a B
+B -> b A
+A -> a
+END
