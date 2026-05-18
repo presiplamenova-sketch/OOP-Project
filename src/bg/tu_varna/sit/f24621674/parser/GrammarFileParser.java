@@ -16,7 +16,6 @@ import java.util.List;
  * START <startNonTerminal>
  * <rule_1>
  * END
- *
  * Редове започващи с # са коментари и се игнорират
  */
 public class GrammarFileParser {
@@ -56,12 +55,20 @@ public class GrammarFileParser {
                 if (current != null) {
                     throw new ParseException("Нова GRAMMAR започва преди END (ред " + (i + 1) + ")");
                 }
-                String name = line.substring("GRAMMAR".length()).trim();
-                if (name.isEmpty()) {
-                    name = "Grammar_" + (grammars.size() + 1);
+                String rest = line.substring("GRAMMAR".length()).trim();
+                int id;
+                String name;
+                String[] parts = rest.split("\\s+", 2);
+                if (parts.length == 2 && parts[0].matches("\\d+")) {
+                    id = Integer.parseInt(parts[0]);
+                    name = parts[1];
+                    idGenerator.syncTo(id + 1);
+                } else {
+                    id = idGenerator.nextId();
+                    name = rest.isEmpty() ? "Grammar_" + (grammars.size() + 1) : rest;
                 }
                 // временно слагаме фиктивен стартов символ S ще го подменим при START
-                current = new Grammar(idGenerator.nextId(), name, new NonTerminal("S"));
+                current = new Grammar(id, name, new NonTerminal("S"));
                 expectStart = true;
             } else if (upper.startsWith("START")) {
                 if (current == null) {
@@ -121,7 +128,7 @@ public class GrammarFileParser {
      */
     public String serialize(Grammar g) {
         StringBuilder sb = new StringBuilder();
-        sb.append("GRAMMAR ").append(g.getName()).append('\n');
+        sb.append("GRAMMAR ").append(g.getId()).append(' ').append(g.getName()).append('\n');
         sb.append("START ").append(g.getStartSymbol().getValue()).append('\n');
         for (Rule r : g.getRules()) {
             sb.append(r.toString()).append('\n');

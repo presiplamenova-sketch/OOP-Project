@@ -55,10 +55,10 @@ public class GrammarRepository {
     public List<Grammar> all() {
         return Collections.unmodifiableList(new ArrayList<>(grammars.values()));
     }
-
     /** Изтрива всички граматики от хранилището   */
     public void clear() {
         grammars.clear();
+        idGenerator.reset();
     }
 
     /** @return броят на заредените граматики   */
