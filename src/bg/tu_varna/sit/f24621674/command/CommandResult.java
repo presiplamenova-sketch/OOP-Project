@@ -40,8 +40,9 @@ public final class CommandResult {
         return new CommandResult(false, message);
     }
 
-    /** @return true ако командата е изпълнена успешно  */
-    public boolean isSuccess() {
+    /**
+     * @return true ако командата е изпълнена успешно
+     */    public boolean isSuccess() {
         return success;
     }
 

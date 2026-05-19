@@ -6,9 +6,8 @@ import bg.tu_varna.sit.f24621674.command.CommandResult;
 import bg.tu_varna.sit.f24621674.model.Grammar;
 
 import java.util.List;
-
 /**
- * Команда iter <id> - създава нова граматика за звездата на Клини
+ * Команда iter &lt;id&gt; - създава нова граматика за звездата на Клини
  */
 public class IterCommand extends AbstractCommand {
 

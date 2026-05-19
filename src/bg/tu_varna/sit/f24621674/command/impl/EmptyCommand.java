@@ -7,7 +7,7 @@ import bg.tu_varna.sit.f24621674.model.Grammar;
 
 import java.util.List;
 
-/** Команда empty <id> - проверява дали езикът на граматика е празен */
+/** Команда empty &lt;id&gt; - проверява дали езикът на граматика е празен */
 public class EmptyCommand extends AbstractCommand {
 
     @Override

@@ -8,9 +8,10 @@ import bg.tu_varna.sit.f24621674.model.Grammar;
 import java.util.List;
 
 /**
- * Команда print <id> - показва граматика с номерирани правила
+ * Команда print &lt;id&gt; - показва граматика с номерирани правила
  * Номерата на правилата се използват от командата removeRule
  */
+
 public class PrintCommand extends AbstractCommand {
 
     @Override

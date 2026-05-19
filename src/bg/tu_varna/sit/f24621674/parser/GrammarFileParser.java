@@ -12,9 +12,9 @@ import java.util.List;
 /**
  * Parses файл с граматики в нашия текстов формат
  * Форматът на една граматика е:
- * GRAMMAR <name>
- * START <startNonTerminal>
- * <rule_1>
+ * GRAMMAR &lt;name&gt;
+ * START &lt;startNonTerminal&gt;
+ * &lt;rule_1&gt;
  * END
  * Редове започващи с # са коментари и се игнорират
  */
@@ -36,6 +36,10 @@ public class GrammarFileParser {
      * @return списък с граматики
      */
     public List<Grammar> parseAll(String fileContent, IdGenerator idGenerator) {
+        // Премахва BOM символ ако има такъв
+        if (fileContent.startsWith("\uFEFF")) {
+            fileContent = fileContent.substring(1);
+        }
         List<Grammar> grammars = new ArrayList<>();
         String[] lines = fileContent.split("\\r?\\n");
 
@@ -67,7 +71,6 @@ public class GrammarFileParser {
                     id = idGenerator.nextId();
                     name = rest.isEmpty() ? "Grammar_" + (grammars.size() + 1) : rest;
                 }
-                // временно слагаме фиктивен стартов символ S ще го подменим при START
                 current = new Grammar(id, name, new NonTerminal("S"));
                 expectStart = true;
             } else if (upper.startsWith("START")) {
@@ -92,7 +95,6 @@ public class GrammarFileParser {
                     throw new ParseException("Неочакван ред извън GRAMMAR блок (ред " + (i + 1) + "): " + line);
                 }
                 if (expectStart) {
-                    // ако няма явен START приемаме че първото правило задава стартовия символ
                     Rule first = ruleParser.parse(line);
                     current.setStartSymbol(first.getLeft());
                     current.addRule(first);

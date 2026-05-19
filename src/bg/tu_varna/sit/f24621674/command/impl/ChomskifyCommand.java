@@ -8,7 +8,7 @@ import bg.tu_varna.sit.f24621674.model.Grammar;
 import java.util.List;
 
 /**
- * Команда chomskify <id> - преобразува граматика до нормална форма на Чомски
+ * Команда chomskify &lt;id&gt; - преобразува граматика до нормална форма на Чомски
  * Създава нова граматика и я добавя в архив
  */
 public class ChomskifyCommand extends AbstractCommand {

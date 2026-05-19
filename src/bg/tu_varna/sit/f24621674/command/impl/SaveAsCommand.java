@@ -9,8 +9,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 /**
- * Команда saveAs <path> - записва сесията в нов файл
- * Поддържа и синтаксис save as <path>
+ * Команда saveAs &lt;path&gt; - записва сесията в нов файл
+ * Поддържа и синтаксис save as &lt;path&gt;
  * Новият файл става текущ след записа
  */
 public class SaveAsCommand extends AbstractCommand {

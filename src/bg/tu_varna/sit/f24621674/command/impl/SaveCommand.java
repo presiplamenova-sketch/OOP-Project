@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Команда save - записва направените промени
  * Без аргументи записва всички граматики в текущия файл
- * С аргументи save <id> <path> записва една граматика в нов файл
+ * С аргументи save &lt;id&gt; &lt;path&gt; записва една граматика в нов файл
  */
 public class SaveCommand extends AbstractCommand {
 
@@ -28,8 +28,7 @@ public class SaveCommand extends AbstractCommand {
 
     @Override
     public String usage() {
-        return "save | save <id> <path>";
-    }
+        return "save | save &lt;id&gt; &lt;path&gt;";    }
 
     @Override
     public boolean requiresOpenFile() {

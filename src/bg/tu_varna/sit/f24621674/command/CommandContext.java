@@ -100,8 +100,10 @@ public class CommandContext {
         return Optional.ofNullable(currentFile);
     }
 
-    /** Задава текущия файл @param file пътят до файла  */
-    public void setCurrentFile(Path file) {
+    /**
+     * Задава текущия файл
+     * @param file пътят до файла
+     */    public void setCurrentFile(Path file) {
         this.currentFile = file;
     }
 

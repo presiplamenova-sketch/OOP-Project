@@ -9,7 +9,7 @@ import bg.tu_varna.sit.f24621674.model.Rule;
 import java.util.List;
 
 /**
- * Команда removeRule <id> <ruleNumber> - премахва правило по номер
+ * Команда removeRule &lt;id&gt; &lt;ruleNumber&gt; - премахва правило по номер
  * Номерът е същият който се вижда при командата print
  */
 public class RemoveRuleCommand extends AbstractCommand {

@@ -10,7 +10,7 @@ import bg.tu_varna.sit.f24621674.parser.RuleParser;
 import java.util.List;
 
 /**
- * Команда addRule <id> <rule> - добавя правило към граматика
+ * Команда addRule &lt;id&gt; &lt;rule&gt; - добавя правило към граматика
  * Поддържа компактен (S->aA) и разделен (S -> a A) синтаксис
  */
 public class AddRuleCommand extends AbstractCommand {

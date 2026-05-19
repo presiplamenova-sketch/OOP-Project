@@ -6,9 +6,8 @@ import bg.tu_varna.sit.f24621674.command.CommandResult;
 import bg.tu_varna.sit.f24621674.model.Grammar;
 
 import java.util.List;
-
 /**
- * Команда union <id1> <id2> - създава нова граматика чийто език е обединението на двата езика
+ * Команда {@code union <id1> <id2>} - създава нова граматика чийто език е обединението на двата езика
  */
 public class UnionCommand extends AbstractCommand {
 

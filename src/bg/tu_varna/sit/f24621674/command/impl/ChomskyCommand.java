@@ -7,7 +7,7 @@ import bg.tu_varna.sit.f24621674.model.Grammar;
 
 import java.util.List;
 
-/** Команда chomsky <id> - проверява дали граматика е в нормална форма на Чомски */
+/** Команда chomsky &lt;id&gt; - проверява дали граматика е в нормална форма на Чомски */
 public class ChomskyCommand extends AbstractCommand {
 
     @Override
